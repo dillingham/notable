@@ -1,5 +1,5 @@
 {
-    "name": "dillingham/markdox",
+    "name": "dillingham/markdown",
     "description": "Markdown to static content",
     "license": "MIT",
     "require": {
@@ -12,13 +12,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Markdox\\": "src/"
+            "Dillingham\\Markdown\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Markdox\\Provider"
+                "Dillingham\\Markdown\\Provider"
             ]
         }
     },

@@ -1,6 +1,6 @@
 <?php
 
-namespace Markdox;
+namespace Dillingham\Markdown;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
