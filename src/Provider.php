@@ -19,29 +19,43 @@ class Provider extends ServiceProvider
         Route::macro('everything', function($path) {
 
             foreach((new Finder)->files()->in($path) as $file) {
-                $isIndexPath = false;
-                $route = $file->getPathName();
-                $route = str_replace($path, '', $route);
+                // if modified time: check if file has been modified since cached
+                // if not, return html to the article view
+                // else render the markdown and cache again
 
-                app('dillingham.markdown')->addFile($file);
+                $isIndexPath = false;
+                $relative = $file->getPathName();
+                $relative = str_replace($path, '', $relative);
+
+                $route = $relative;
 
                 if(Str::endsWith($route, 'index.md')) {
                     $isIndexPath = true;
                     $route = str_replace('index.md', '', $route);
                 }
 
+                $relative = str_replace('index.md', '', $relative);
+                $relative = str_replace('.md', '', $relative);
                 $route = str_replace('.md', '', $route);
                 $route = str_replace(DIRECTORY_SEPARATOR, '/', $route);
                 $view = ltrim(str_replace('/', '.', $route), '.');
                 $view = $isIndexPath ? $view."index" : $view;
+
+                app('dillingham.markdown')->addFile([
+                    'display' => (string) Str::of(\rtrim($route, '/'))->afterLast('/')->title(),
+                    'path' => $relative,
+                    'name' => $view,
+                ]);
+
                 Route::markdown($route, $view, $path);
             }
         });
 
-        Route::macro('markdown', function($uri, $view, $path) {
-            Route::get($uri, function() use($view, $path) {
+        Route::macro('markdown', function($uri, $view, $path = null) {
+            return Route::get($uri, function() use($view, $path) {
                 $content = \file_get_contents($path.DIRECTORY_SEPARATOR.str_replace('.', DIRECTORY_SEPARATOR, $view).'.md');
                 $content = (new \Parsedown)->text($content);
+                // cache
                 return view(config('markdox.article', 'article'), [
                     'markdown' => $view,
                     'content' => $content

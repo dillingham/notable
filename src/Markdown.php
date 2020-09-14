@@ -15,4 +15,12 @@ class Markdown
     {
         return $this->files;
     }
+
+    public function links()
+    {
+        foreach($this->files as $file)
+        {
+            echo '<li class="list-none"><a href="'.$file['path'].'">'.$file['display'].'</a></li>';
+        }
+    }
 }
