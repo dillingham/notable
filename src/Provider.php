@@ -58,6 +58,7 @@ class Provider extends ServiceProvider
                 // cache
                 return view(config('markdox.article', 'article'), [
                     'markdown' => $view,
+                    'markdown_path' => "$uri.md",
                     'content' => $content
                 ]);
             });
