@@ -52,13 +52,15 @@ class Provider extends ServiceProvider
         });
 
         Route::macro('markdown', function($uri, $view, $path = null) {
-            return Route::get($uri, function() use($view, $path) {
+            return Route::get($uri, function() use($view, $path, $uri) {
                 $content = \file_get_contents($path.DIRECTORY_SEPARATOR.str_replace('.', DIRECTORY_SEPARATOR, $view).'.md');
                 $content = (new \Parsedown)->text($content);
                 // cache
                 return view(config('markdox.article', 'article'), [
                     'markdown' => $view,
                     'markdown_path' => "$uri.md",
+                    'path' => $path,
+                    'view' => $view,
                     'content' => $content
                 ]);
             });
