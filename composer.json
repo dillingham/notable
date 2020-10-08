@@ -1,5 +1,5 @@
 {
-    "name": "dillingham/markdown",
+    "name": "dillingham/notable",
     "description": "Markdown to static content",
     "license": "MIT",
     "require": {
@@ -7,18 +7,17 @@
         "erusev/parsedown": "^1.7"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.2",
-        "orchestra/testbench": "^5.3"
+        "phpunit/phpunit": "^9.2"
     },
     "autoload": {
         "psr-4": {
-            "Dillingham\\Markdown\\": "src/"
+            "Notable\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Dillingham\\Markdown\\Provider"
+                "Notable\\Provider"
             ]
         }
     },

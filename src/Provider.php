@@ -1,22 +1,28 @@
 <?php
 
-namespace Dillingham\Markdown;
+namespace Notable;
 
-use Dillingham\Markdown\Markdown;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Notable\Notable;
 use Symfony\Component\Finder\Finder;
 
 class Provider extends ServiceProvider
 {
     public function boot()
     {
-        $this->app->singleton('dillingham.markdown', function(){
-            return new Markdown;
+        $this->app->singleton('notable', function(){
+            return new Notable;
         });
 
-        Route::macro('everything', function($path) {
+        Route::macro('markdown', function($prefix, $path) {
+
+            if(!is_dir($path) && file_exists($path)) {
+                // markdown file
+            } else {
+                // loop below
+            }
 
             foreach((new Finder)->files()->in($path) as $file) {
                 // if modified time: check if file has been modified since cached
@@ -41,29 +47,25 @@ class Provider extends ServiceProvider
                 $view = ltrim(str_replace('/', '.', $route), '.');
                 $view = $isIndexPath ? $view."index" : $view;
 
-                app('dillingham.markdown')->addFile([
+                app('notable')->addFile([
                     'display' => (string) Str::of(\rtrim($route, '/'))->afterLast('/')->title(),
                     'path' => $relative,
                     'name' => $view,
                 ]);
 
-                Route::markdown($route, $view, $path);
+                Route::get($route, function() use($view, $path, $route) {
+                    $content = \file_get_contents($path.DIRECTORY_SEPARATOR.str_replace('.', DIRECTORY_SEPARATOR, $view).'.md');
+                    $content = (new \Parsedown)->text($content);
+                    // cache
+                    return view(config('notable.article', 'docs.show'), [
+                        'markdown_path' => "$route.md",
+                        'content' => $content,
+                        'markdown' => $view,
+                        'path' => $path,
+                        'view' => $view,
+                    ]);
+                });
             }
-        });
-
-        Route::macro('markdown', function($uri, $view, $path = null) {
-            return Route::get($uri, function() use($view, $path, $uri) {
-                $content = \file_get_contents($path.DIRECTORY_SEPARATOR.str_replace('.', DIRECTORY_SEPARATOR, $view).'.md');
-                $content = (new \Parsedown)->text($content);
-                // cache
-                return view(config('markdox.article', 'article'), [
-                    'markdown' => $view,
-                    'markdown_path' => "$uri.md",
-                    'path' => $path,
-                    'view' => $view,
-                    'content' => $content
-                ]);
-            });
         });
     }
 
