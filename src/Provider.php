@@ -12,9 +12,9 @@ class Provider extends ServiceProvider
 {
     public function boot()
     {
-        $this->app->singleton('notable', function(){
-            return new Notable;
-        });
+        // $this->app->singleton('notable', function(){
+        //     return new Notable;
+        // });
 
         Route::macro('markdown', function($prefix, $path) {
 
@@ -47,11 +47,11 @@ class Provider extends ServiceProvider
                 $view = ltrim(str_replace('/', '.', $route), '.');
                 $view = $isIndexPath ? $view."index" : $view;
 
-                app('notable')->addFile([
-                    'display' => (string) Str::of(\rtrim($route, '/'))->afterLast('/')->title(),
-                    'path' => $relative,
-                    'name' => $view,
-                ]);
+                // app('notable')->addFile([
+                //     'display' => (string) Str::of(\rtrim($route, '/'))->afterLast('/')->title(),
+                //     'path' => $relative,
+                //     'name' => $view,
+                // ]);
 
                 Route::get($route, function() use($view, $path, $route) {
                     $content = \file_get_contents($path.DIRECTORY_SEPARATOR.str_replace('.', DIRECTORY_SEPARATOR, $view).'.md');
