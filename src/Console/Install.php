@@ -59,10 +59,10 @@ class Install extends Command
 
     public function addDocsViews()
     {
-        file_put_contents(resource_path('views/docs/show.blade.php'), file_get_contents(__DIR__.'../../resources/views/show.blade.php'));
+        file_put_contents(resource_path('views/docs/show.blade.php'), file_get_contents(__DIR__.'/../../resources/views/show.blade.php'));
 
         if(!file_exits(resource_path('layouts/app.blade.php'))) {
-            file_put_contents(resource_path('layouts/app.blade.php'), file_get_contents(__DIR__.'../../resources/views/layouts/app.blade.php'));
+            file_put_contents(resource_path('layouts/app.blade.php'), file_get_contents(__DIR__.'/../../resources/views/layouts/app.blade.php'));
         }
     }
 
