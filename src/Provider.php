@@ -23,8 +23,6 @@ class Provider extends ServiceProvider
             ]);
         }
 
-
-
         Route::macro('markdown', function($prefix, $path) {
 
             if(!is_dir($path) && file_exists($path)) {
@@ -69,6 +67,8 @@ class Provider extends ServiceProvider
                         // cache
                         return view(config('notable.article', 'docs.show'), [
                             'markdown_path' => "$route.md",
+                            'docs' => app('notable'),
+                            'edit_link' => app('notable')->editLink($path),
                             'content' => $content,
                             'markdown' => $view,
                             'path' => $path,

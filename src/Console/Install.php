@@ -34,6 +34,7 @@ class Install extends Command
             return;
         }
 
+        $this->makeDirIfMissing(resource_path('views/layouts'));
         $this->makeDirIfMissing(resource_path('views/docs'));
         $this->makeDirIfMissing(base_path('docs'));
 
@@ -61,8 +62,8 @@ class Install extends Command
     {
         file_put_contents(resource_path('views/docs/show.blade.php'), file_get_contents(__DIR__.'/../../resources/views/show.blade.php'));
 
-        if(!file_exits(resource_path('layouts/app.blade.php'))) {
-            file_put_contents(resource_path('layouts/app.blade.php'), file_get_contents(__DIR__.'/../../resources/views/layouts/app.blade.php'));
+        if(!file_exists(resource_path('views/layouts/app.blade.php'))) {
+            file_put_contents(resource_path('views/layouts/app.blade.php'), file_get_contents(__DIR__.'/../../resources/views/layouts/app.blade.php'));
         }
     }
 

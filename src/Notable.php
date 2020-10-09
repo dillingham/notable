@@ -1,11 +1,3 @@
-<!-- ---
-title: 'My Great Document'
-author: 'Yours Truly'
-description: 'A short document with very little to say'
-status: 'public'
-created_at: '2017-11-18 12:01:00'
---- -->
-
 <?php
 
 namespace Notable;
@@ -27,6 +19,16 @@ class Notable
         $this->files[] = $file;
     }
 
+    public function editLink($path)
+    {
+        return 'todo';
+    }
+
+    public function sections()
+    {
+        return [];
+    }
+
     public function getFiles()
     {
         return $this->files;
@@ -34,9 +36,8 @@ class Notable
 
     public function links()
     {
-        foreach($this->files as $file)
-        {
-            echo '<li class="list-none"><a href="'.$file['path'].'">'.$file['display'].'</a></li>';
-        }
+        return collect($this->files)->flatMap(function($file) {
+            return [$file['path'] => $file['display']];
+        });
     }
 }
