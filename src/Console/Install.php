@@ -53,7 +53,7 @@ class Install extends Command
     public function addDocsRoutes()
     {
         $routes = file_get_contents(base_path('routes/web.php'));
-        $routes = str_replace('<?php', "<?php\n\nRoute::markdown('docs', base_path('docs'));");
+        $routes = str_replace('<?php', "<?php\n\nRoute::markdown('docs', base_path('docs'));", $routes);
         file_put_contents(base_path('routes/web.php'), $routes);
     }
 
