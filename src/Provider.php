@@ -5,6 +5,7 @@ namespace Notable;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Notable\Console\Install;
 use Notable\Notable;
 use Symfony\Component\Finder\Finder;
 
@@ -15,6 +16,14 @@ class Provider extends ServiceProvider
         $this->app->singleton('notable', function(){
             return new Notable;
         });
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Install::class,
+            ]);
+        }
+
+
 
         Route::macro('markdown', function($prefix, $path) {
 
