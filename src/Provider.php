@@ -2,12 +2,11 @@
 
 namespace Notable;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Notable\Console\Install;
 use Notable\Notable;
-use Symfony\Component\Finder\Finder;
 
 class Provider extends ServiceProvider
 {
@@ -23,60 +22,12 @@ class Provider extends ServiceProvider
             ]);
         }
 
-        Route::macro('markdown', function($prefix, $path) {
+        Route::macro('docs', function($root = 'docs', $path = null) {
+            return app('notable')->route($root, $path);
+        });
 
-            if(!is_dir($path) && file_exists($path)) {
-                // markdown file
-            } else {
-                // loop below
-            }
-
-            foreach((new Finder)->files()->in($path) as $file) {
-                // if modified time: check if file has been modified since cached
-                // if not, return html to the article view
-                // else render the markdown and cache again
-
-                $isIndexPath = false;
-                $relative = $file->getPathName();
-                $relative = str_replace($path, '', $relative);
-
-                $route = $relative;
-
-                if(Str::endsWith($route, 'index.md')) {
-                    $isIndexPath = true;
-                    $route = str_replace('index.md', '', $route);
-                }
-
-                $relative = str_replace('index.md', '', $relative);
-                $relative = str_replace('.md', '', $relative);
-                $route = str_replace('.md', '', $route);
-                $route = str_replace(DIRECTORY_SEPARATOR, '/', $route);
-                $view = ltrim(str_replace('/', '.', $route), '.');
-                $view = $isIndexPath ? $view."index" : $view;
-
-                app('notable')->addFile([
-                    'display' => (string) Str::of(\rtrim($route, '/'))->afterLast('/')->title(),
-                    'path' => $relative,
-                    'name' => $view,
-                ]);
-
-                Route::prefix($prefix)->group(function () use($view, $path, $route) {
-                    Route::get($route, function() use($view, $path, $route) {
-                        $content = \file_get_contents($path.DIRECTORY_SEPARATOR.str_replace('.', DIRECTORY_SEPARATOR, $view).'.md');
-                        $content = (new \Parsedown)->text($content);
-                        // cache
-                        return view(config('notable.article', 'docs.show'), [
-                            'markdown_path' => "$route.md",
-                            'docs' => app('notable'),
-                            'edit_link' => app('notable')->editLink($path),
-                            'content' => $content,
-                            'markdown' => $view,
-                            'path' => $path,
-                            'view' => $view,
-                        ]);
-                    });
-                });
-            }
+        Blade::directive('markdown', function ($expression) {
+            return app('notable')->directive($expression);
         });
     }
 

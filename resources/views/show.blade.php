@@ -13,11 +13,11 @@
     </div>
     <div class="w-3/5 bg-white p-12 rounded-lg shadow">
         <div class="prose">
-            {!! $docs->content !!}
+            {!! $content !!}
         </div>
         <div class="flex justify-between border-t mt-4 pt-4">
-            @if($docs->edit_link)
-                <a href="{{ $docs->edit_link }}" target="_BLANK" rel="nofollow">
+            @if($edit_link)
+                <a href="{{ $edit_link }}" target="_BLANK" rel="nofollow">
                     Edit this page
                 </a>
             @endif
@@ -25,10 +25,12 @@
         </div>
     </div>
     <div class="w-1/5 relative">
-        <p>On This Page</p>
-        @foreach($docs->sections() as $href => $section)
-            <li><a href="{{ $href }}">{{ $section }}</a></li>
-        @endforeach
+        @if(count($sections))
+            <p>On This Page</p>
+            @foreach($sections as $href => $section)
+                <li><a href="{{ $href }}">{{ $section }}</a></li>
+            @endforeach
+        @endif
     </div>
 </div>
 @endsection
