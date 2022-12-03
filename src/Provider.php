@@ -22,7 +22,7 @@ class Provider extends ServiceProvider
             ]);
         }
 
-        Route::macro('docs', function($root = 'docs', $path = null) {
+        Route::macro('markdown', function($root = 'docs', $path = null) {
             return app('notable')->route($root, $path);
         });
 
