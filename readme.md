@@ -43,6 +43,8 @@ It isn't the folder's name. It can be changed.
 
 ```php
 Route::markdown()
+    ->directory(base_path('docs'))
     ->prefix('documentation')
     ->view('docs.show')
+    ->sections(config('docs.sections'))
 ```
