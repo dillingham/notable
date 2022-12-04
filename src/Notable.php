@@ -2,133 +2,87 @@
 
 namespace Notable;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\View;
+use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 
 class Notable
 {
-    public $files;
+    protected array $pages;
 
-    public $content;
+    protected array $sections;
 
-    public function meta()
-    {
-        $this->content;
-        // if starts with ---
-        // $yaml = extract between first & second ---
-        $meta = yaml_parse($yaml);
-    }
-
-    public function addFile($file)
-    {
-        $this->files[] = $file;
-    }
-
-    public function editLink($path)
-    {
-        return 'todo';
-    }
-
-    public function sections()
-    {
-        return [];
-    }
-
-    public function getFiles()
-    {
-        return $this->files;
-    }
-
-    public function links()
-    {
-        return collect($this->files)->flatMap(function($file) {
-            return [$file['path'] => $file['display']];
-        });
-    }
-
-    public function get($path)
-    {
-        $path = trim($path, '"');
-        $path = trim($path, "'");
-        $content = \file_get_contents(base_path(str_replace('.', DIRECTORY_SEPARATOR, $path) . '.md'));
-        return (new \Parsedown)->text($content);
-    }
-
-    public function directive($expression)
-    {
-        $content = $this->get($expression);
-
-        return "<?php echo '$content'; ?>";
-    }
-
-    public function route($prefix = 'docs', $path = null)
+    public function setup($prefix = 'docs', $path = null)
     {
         if(is_null($path)) {
             $path = base_path('docs');
         }
 
         if (!is_dir($path) && file_exists($path)) {
-            // markdown file
-        } else {
-            // loop below
+            return $this->makeRoute(
+                $this->makePageObject($prefix, $path, $path)
+            );
         }
 
         foreach ((new Finder)->files()->in($path) as $file) {
-            // if modified time: check if file has been modified since cached
-            // if not, return html to the article view
-            // else render the markdown and cache again
-
-            $isIndexPath = false;
-            $relative = $file->getPathName();
-            $relative = str_replace($path, '', $relative);
-
-            $route = $relative;
-
-            if (Str::endsWith($route, 'index.md')) {
-                $isIndexPath = true;
-                $route = str_replace('index.md', '', $route);
-            }
-
-            $relative = str_replace('index.md', '', $relative);
-            $relative = str_replace('.md', '', $relative);
-            $route = str_replace('.md', '', $route);
-            $route = str_replace(DIRECTORY_SEPARATOR, '/', $route);
-            $view = ltrim(str_replace('/', '.', $route), '.');
-            $view = $isIndexPath ? $view . "index" : $view;
-
-            app('notable')->addFile([
-                'display' => (string) Str::of(\rtrim($route, '/'))->afterLast('/')->title(),
-                'path' => $relative,
-                'name' => $view,
-            ]);
-
-            Route::prefix($prefix)->group(function () use ($view, $path, $route) {
-                Route::get($route, function () use ($view, $path, $route) {
-                    $content = \file_get_contents($path . DIRECTORY_SEPARATOR . str_replace('.', DIRECTORY_SEPARATOR, $view) . '.md');
-                    $content = (new \Parsedown)->text($content);
-                    // cache
-
-                    $meta_title = (string) Str::of(\rtrim($route, '/'))->afterLast('/')->title();
-
-                    if (!$meta_title) {
-                        $meta_title = 'Get Started';
-                    }
-
-                    return view(config('notable.article', 'docs.show'), [
-                        'markdown_path' => "$route.md",
-                        'sections' => [],
-                        'links' => [],
-                        'docs' => app('notable'),
-                        'meta_title' => $meta_title,
-                        'edit_link' => app('notable')->editLink($path),
-                        'content' => $content,
-                        'markdown' => $view,
-                        'path' => $path,
-                        'view' => $view,
-                    ]);
-                });
-            });
+            $page = new Page($prefix, $path, $file);
+            $this->makeRoute($page);
+            $this->addPage($page);
+            $this->addSectionLink($page);
         }
+    }
+
+    public function addPage(Page $page): array
+    {
+        $this->pages[] = $page;
+
+        return $this->pages;
+    }
+
+    public function addSectionLink($page): array
+    {
+        $this->sections[$page->section()][$page->link()] = $page->display();
+
+        return $this->sections;
+    }
+
+    public function sections(): array
+    {
+        return $this->sections;
+    }
+
+    public function links(): Collection
+    {
+        return collect($this->pages)->flatMap(function($page) {
+            return [$page->link() => $page->display()];
+        });
+    }
+
+    public function makePageObject($prefix, $path, $file): Page
+    {
+        $info = new SplFileInfo($file);
+
+        $file = new \Symfony\Component\Finder\SplFileInfo(
+            $info->getFilename(),
+            $info->getPath(),
+            $info->getPathname()
+        );
+
+        return new Page($prefix, $path, $file);
+    }
+
+    public function makeRoute(Page $page): bool
+    {
+        Route::get($page->route(), function () use ($page) {
+            return View::make(config('notable.page.view', 'docs.show'), [
+                'docs' => $this,
+                'page' => $page,
+            ]);
+        });
+
+        return true;
     }
 }

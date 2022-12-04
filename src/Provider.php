@@ -23,11 +23,7 @@ class Provider extends ServiceProvider
         }
 
         Route::macro('markdown', function($root = 'docs', $path = null) {
-            return app('notable')->route($root, $path);
-        });
-
-        Blade::directive('markdown', function ($expression) {
-            return app('notable')->directive($expression);
+            return app('notable')->setup($root, $path);
         });
     }
 
