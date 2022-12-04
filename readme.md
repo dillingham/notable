@@ -35,6 +35,14 @@ It isn't the folder's name. It can be changed.
 
 ### TODO:
 
-- [ ] Cache html rendered markdown
+- [ ] Cache html rendered markdown.. if modified time > last cache, render
+- [ ] Add route helpers for settings (see below)
 - [ ] Add "On this page" section links
 - [ ] Add repository config for "edit page"
+
+
+```php
+Route::markdown()
+    ->prefix('documentation')
+    ->view('docs.show')
+```
