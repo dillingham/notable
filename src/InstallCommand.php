@@ -1,11 +1,11 @@
 <?php
 
-namespace Notable\Console;
+namespace Notable;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
-class Install extends Command
+class InstallCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -54,7 +54,7 @@ class Install extends Command
     public function addDocsRoutes()
     {
         $routes = file_get_contents(base_path('routes/web.php'));
-        $routes = str_replace('<?php', "<?php\n\nRoute::docs();", $routes);
+        $routes = str_replace('<?php', "<?php\n\nRoute::markdown();", $routes);
         file_put_contents(base_path('routes/web.php'), $routes);
     }
 

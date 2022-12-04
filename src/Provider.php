@@ -5,7 +5,7 @@ namespace Notable;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Notable\Console\Install;
+use Notable\InstallCommand;
 use Notable\Notable;
 
 class Provider extends ServiceProvider
@@ -18,7 +18,7 @@ class Provider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                Install::class,
+                InstallCommand::class,
             ]);
         }
 
