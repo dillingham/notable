@@ -36,6 +36,7 @@ It isn't the folder's name. It can be changed.
 ### TODO:
 
 - [ ] Cache html rendered markdown.. if modified time > last cache, render
+- [ ] Add folder and file number ordering 1-getting-started -> 1-installation
 - [ ] Add route helpers for settings (see below)
 - [ ] Add "On this page" section links
 - [ ] Add repository config for "edit page"
